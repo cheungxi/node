@@ -294,6 +294,10 @@ class V8_EXPORT_PRIVATE ObjectRef {
   JSHeapBroker* broker_;
 };
 
+inline bool operator==(ObjectRef const& obj1, ObjectRef const& obj2) {
+  return obj1.equals(obj2);
+}
+
 template <class T>
 using ZoneRefUnorderedSet =
     ZoneUnorderedSet<T, ObjectRef::Hash, ObjectRef::Equal>;
@@ -527,6 +531,8 @@ class ContextRef : public HeapObjectRef {
 
   // Only returns a value if the index is valid for this ContextRef.
   base::Optional<ObjectRef> get(int index) const;
+
+  ScopeInfoRef scope_info() const;
 };
 
 #define BROKER_NATIVE_CONTEXT_FIELDS(V)          \
@@ -584,7 +590,6 @@ class NativeContextRef : public ContextRef {
   BROKER_NATIVE_CONTEXT_FIELDS(DECL_ACCESSOR)
 #undef DECL_ACCESSOR
 
-  ScopeInfoRef scope_info() const;
   MapRef GetFunctionMapFromIndex(int index) const;
   MapRef GetInitialJSArrayMap(ElementsKind kind) const;
   base::Optional<JSFunctionRef> GetConstructorFunction(const MapRef& map) const;
@@ -879,6 +884,7 @@ class ScopeInfoRef : public HeapObjectRef {
   int ContextLength() const;
   bool HasOuterScopeInfo() const;
   bool HasContextExtensionSlot() const;
+  bool ClassScopeHasPrivateBrand() const;
 
   ScopeInfoRef OuterScopeInfo() const;
 };
@@ -899,6 +905,7 @@ class ScopeInfoRef : public HeapObjectRef {
   V(int, StartPosition)                                    \
   V(bool, is_compiled)                                     \
   V(bool, IsUserJavaScript)                                \
+  V(bool, requires_instance_members_initializer)           \
   IF_WASM(V, const wasm::WasmModule*, wasm_module)         \
   IF_WASM(V, const wasm::FunctionSig*, wasm_function_signature)
 

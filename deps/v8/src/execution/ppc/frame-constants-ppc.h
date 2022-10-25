@@ -16,28 +16,29 @@ namespace internal {
 class EntryFrameConstants : public AllStatic {
  public:
   // Need to take constant pool into account.
-  static constexpr int kCallerFPOffset =
-      v8_flags.enable_embedded_constant_pool.value() ? -4 * kSystemPointerSize
-                                                     : -3 * kSystemPointerSize;
+  static constexpr int kCallerFPOffset = V8_EMBEDDED_CONSTANT_POOL_BOOL
+                                             ? -4 * kSystemPointerSize
+                                             : -3 * kSystemPointerSize;
 };
 
-class WasmCompileLazyFrameConstants : public TypedFrameConstants {
+class WasmLiftoffSetupFrameConstants : public TypedFrameConstants {
  public:
   // Number of gp parameters, without the instance.
   static constexpr int kNumberOfSavedGpParamRegs = 6;
   static constexpr int kNumberOfSavedFpParamRegs = 8;
 
+  // There's one spilled value (which doesn't need visiting) below the instance.
   static constexpr int kInstanceSpillOffset =
-      TYPED_FRAME_PUSHED_VALUE_OFFSET(0);
+      TYPED_FRAME_PUSHED_VALUE_OFFSET(1);
 
   static constexpr int kParameterSpillsOffset[] = {
-      TYPED_FRAME_PUSHED_VALUE_OFFSET(1), TYPED_FRAME_PUSHED_VALUE_OFFSET(2),
-      TYPED_FRAME_PUSHED_VALUE_OFFSET(3), TYPED_FRAME_PUSHED_VALUE_OFFSET(4),
-      TYPED_FRAME_PUSHED_VALUE_OFFSET(5), TYPED_FRAME_PUSHED_VALUE_OFFSET(6)};
+      TYPED_FRAME_PUSHED_VALUE_OFFSET(2), TYPED_FRAME_PUSHED_VALUE_OFFSET(3),
+      TYPED_FRAME_PUSHED_VALUE_OFFSET(4), TYPED_FRAME_PUSHED_VALUE_OFFSET(5),
+      TYPED_FRAME_PUSHED_VALUE_OFFSET(6), TYPED_FRAME_PUSHED_VALUE_OFFSET(7)};
 
   // SP-relative.
   static constexpr int kWasmInstanceOffset = 2 * kSystemPointerSize;
-  static constexpr int kFunctionIndexOffset = 1 * kSystemPointerSize;
+  static constexpr int kDeclaredFunctionIndexOffset = 1 * kSystemPointerSize;
   static constexpr int kNativeModuleOffset = 0;
 };
 
